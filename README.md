@@ -1,4 +1,4 @@
-# Allwinner/Radxa A733 BSP for Linux 6.18
+# Allwinner/Radxa A733 BSP for Linux 6.18 and 7.1
 
 ## Build Instructions
 This repo has already simplified the build process.
@@ -11,6 +11,18 @@ ln -s ../allwinner-bsp/ ./bsp
 git apply ./bsp/patches/*.patch
 cp ./bsp/configs/linux-6.18/*.dts* arch/arm64/boot/dts/allwinner/
 cp ./bsp/configs/linux-6.18/defconfig .config
+
+export BSP_TOP=$PWD/bsp/
+```
+
+Or use Linux 7.1.y:
+```sh
+git clone https://github.com/alexcaoys/allwinner-bsp.git -b linux-7.1.y --single-branch allwinner-bsp
+cd linux-7.1.y
+ln -s ../allwinner-bsp/ ./bsp
+git apply ./bsp/patches/*.patch
+cp ./bsp/configs/linux-7.1.y/*.dts* arch/arm64/boot/dts/allwinner/
+cp ./bsp/configs/linux-7.1.y/defconfig .config
 
 export BSP_TOP=$PWD/bsp/
 ```
@@ -105,8 +117,8 @@ This table adapts this page from linux-sunxi: https://linux-sunxi.org/Linux_main
 |PWM FAN|       |pwm-fan        |**MAIN**|              |
 
 **Status**: 
-- BSP: BSP drivers ported for 6.18.y
-- MAIN: Mainline 6.18 drivers or backported 7.x drivers (in patch)
+- BSP: BSP drivers ported for 6.18.y and 7.1.y
+- MAIN: Mainline 6.18/7.1 drivers or backported 7.x/7.1.x drivers (in patch)
 - PATCH: Off mainline patch
 - OFF: Disabled on Radxa config and/or Radxa device tree
 - UNK: Unknown, disabled now, but enabled on Radxa config/dt
