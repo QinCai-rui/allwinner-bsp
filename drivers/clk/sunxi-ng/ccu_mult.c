@@ -31,11 +31,9 @@ static void ccu_mult_find_best(unsigned long parent, u64 rate,
 	mult->mult = _mult;
 }
 
-static unsigned long ccu_mult_round_rate(struct ccu_mux_internal *mux,
-					 struct clk_hw *parent,
-					 unsigned long *parent_rate,
-					 unsigned long rate,
-					 void *data)
+static int ccu_mult_round_rate(struct ccu_mux_internal *mux,
+			       struct clk_rate_request *req,
+			       void *data)
 {
 	struct ccu_mult *cm = data;
 	struct _ccu_mult _cm;
@@ -47,9 +45,10 @@ static unsigned long ccu_mult_round_rate(struct ccu_mux_internal *mux,
 	else
 		_cm.max = (1 << cm->mult.width) + cm->mult.offset - 1;
 
-	ccu_mult_find_best(*parent_rate, rate, &_cm);
+	ccu_mult_find_best(req->best_parent_rate, req->rate, &_cm);
 
-	return *parent_rate * _cm.mult;
+	req->rate = req->best_parent_rate * _cm.mult;
+	return 0;
 }
 
 static void ccu_mult_disable(struct clk_hw *hw)

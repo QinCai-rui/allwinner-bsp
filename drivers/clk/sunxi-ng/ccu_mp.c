@@ -121,16 +121,15 @@ static unsigned long ccu_mp_find_best_with_parent_adj(struct clk_hw *hw,
 	return best_rate;
 }
 
-static unsigned long ccu_mp_round_rate(struct ccu_mux_internal *mux,
-				       struct clk_hw *hw,
-				       unsigned long *parent_rate,
-				       unsigned long rate,
-				       void *data)
+static int ccu_mp_round_rate(struct ccu_mux_internal *mux,
+			     struct clk_rate_request *req,
+			     void *data)
 {
 	struct ccu_mp *cmp = data;
 	unsigned int max_m, max_p;
 	unsigned int min_m;
 	unsigned int m, p;
+	unsigned long rate = req->rate;
 
 	if (cmp->common.features & CCU_FEATURE_FIXED_POSTDIV)
 		rate *= cmp->fixed_post_div;
@@ -147,20 +146,22 @@ static unsigned long ccu_mp_round_rate(struct ccu_mux_internal *mux,
 	 */
 	if (!(clk_hw_get_flags(&cmp->common.hw) & CLK_SET_RATE_PARENT)) {
 		if (unlikely(cmp->common.features & CCU_FEATURE_MP_NO_INDEX_MODE))
-			ccu_mp_find_best(NORMAL_MODE, *parent_rate, rate, max_m, min_m, max_p, &m, &p);
+			ccu_mp_find_best(NORMAL_MODE, req->best_parent_rate, rate, max_m, min_m, max_p, &m, &p);
 		else
-			ccu_mp_find_best(INDEX_MODE, *parent_rate, rate, max_m, min_m, max_p, &m, &p);
+			ccu_mp_find_best(INDEX_MODE, req->best_parent_rate, rate, max_m, min_m, max_p, &m, &p);
 
-		rate = *parent_rate / p / m;
+		rate = req->best_parent_rate / p / m;
 	} else {
-		rate = ccu_mp_find_best_with_parent_adj(hw, parent_rate, rate,
+		rate = ccu_mp_find_best_with_parent_adj(&cmp->common.hw,
+							&req->best_parent_rate, rate,
 							max_m, min_m, max_p);
 	}
 
 	if (cmp->common.features & CCU_FEATURE_FIXED_POSTDIV)
 		rate /= cmp->fixed_post_div;
 
-	return rate;
+	req->rate = rate;
+	return 0;
 }
 
 static void ccu_mp_disable(struct clk_hw *hw)

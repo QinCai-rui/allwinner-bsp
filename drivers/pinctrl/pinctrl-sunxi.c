@@ -2666,7 +2666,7 @@ int sunxi_bsp_pinctrl_init_with_variant(struct platform_device *pdev,
 
 	pctl->domain = irq_domain_create_hierarchy(pctl->parent_domain, 0,
 					     pctl->desc->irq_banks * IRQ_PER_BANK,
-					     of_node_to_fwnode(node),
+					     of_fwnode_handle(node),
 					     &sunxi_pinctrl_irq_domain_ops,
 					     pctl);
 	if (!pctl->domain) {

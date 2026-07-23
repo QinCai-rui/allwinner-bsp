@@ -105,15 +105,13 @@ static unsigned long ccu_nkm_recalc_rate(struct clk_hw *hw,
 	return rate;
 }
 
-static unsigned long ccu_nkm_round_rate(struct ccu_mux_internal *mux,
-					struct clk_hw *hw,
-					unsigned long *parent_rate,
-					unsigned long _rate,
-					void *data)
+static int ccu_nkm_round_rate(struct ccu_mux_internal *mux,
+			      struct clk_rate_request *req,
+			      void *data)
 {
 	struct ccu_nkm *nkm = data;
 	struct _ccu_nkm _nkm;
-	u64 rate = _rate;
+	u64 rate = req->rate;
 
 	_nkm.min_n = nkm->n.min ?: 1;
 	_nkm.max_n = nkm->n.max ?: 1 << nkm->n.width;
@@ -125,15 +123,16 @@ static unsigned long ccu_nkm_round_rate(struct ccu_mux_internal *mux,
 	if (nkm->common.features & CCU_FEATURE_FIXED_POSTDIV)
 		rate *= nkm->fixed_post_div;
 
-	ccu_nkm_find_best(*parent_rate, rate, &_nkm);
+	ccu_nkm_find_best(req->best_parent_rate, rate, &_nkm);
 
-	rate = *parent_rate * _nkm.n * _nkm.k;
+	rate = req->best_parent_rate * _nkm.n * _nkm.k;
 	do_div(rate, _nkm.m);
 
 	if (nkm->common.features & CCU_FEATURE_FIXED_POSTDIV)
 		do_div(rate, nkm->fixed_post_div);
 
-	return rate;
+	req->rate = rate;
+	return 0;
 }
 
 static int ccu_nkm_determine_rate(struct clk_hw *hw,
