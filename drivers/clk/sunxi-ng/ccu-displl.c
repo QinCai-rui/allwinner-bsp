@@ -149,7 +149,7 @@ struct sunxi_displl_reg_cache {
 
 LIST_HEAD(displl_reg_cache_list);
 
-static int displl_suspend(void)
+static int displl_suspend(void *data)
 {
 	struct sunxi_displl_reg_cache *reg_cache;
 	int num_regs = 0;
@@ -164,7 +164,7 @@ static int displl_suspend(void)
 	return 0;
 }
 
-static void displl_resume(void)
+static void displl_resume(void *data)
 {
 	struct sunxi_displl_reg_cache *reg_cache;
 	int num_regs = 0;
@@ -245,6 +245,10 @@ static struct syscore_ops sunxi_displl_syscore_ops = {
 	.resume = displl_resume,
 };
 
+static struct syscore sunxi_displl_syscore = {
+	.ops = &sunxi_displl_syscore_ops,
+};
+
 void static displl_sleep_init(void __iomem *reg_base,
 				struct ccu_common **rdump,
 				unsigned long nr_rdump, struct ccu_nm *nm)
@@ -267,7 +271,7 @@ void static displl_sleep_init(void __iomem *reg_base,
 	}
 
 	if (list_empty(&displl_reg_cache_list))
-		register_syscore_ops(&sunxi_displl_syscore_ops);
+		register_syscore(&sunxi_displl_syscore);
 
 	reg_cache->reg_base = reg_base;
 	reg_cache->rd_num = nr_rdump;

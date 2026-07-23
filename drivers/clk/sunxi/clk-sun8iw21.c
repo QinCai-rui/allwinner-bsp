@@ -992,7 +992,7 @@ struct periph_init_data *sunxi_cpus_clk_get_periph_by_name(const char *name)
 }
 
 #ifdef CONFIG_PM_SLEEP
-static int sunxi_clk_suspend(void)
+static int sunxi_clk_suspend(void *data)
 {
 	struct sunxi_factor_clk_reg_cache *factor_clk_reg;
 	struct sunxi_periph_clk_reg_cache *periph_clk_reg;
@@ -1005,7 +1005,7 @@ static int sunxi_clk_suspend(void)
 
 	return 0;
 }
-static void sunxi_clk_resume(void)
+static void sunxi_clk_resume(void *data)
 {
 	struct sunxi_factor_clk_reg_cache *factor_clk_reg;
 	struct sunxi_periph_clk_reg_cache *periph_clk_reg;
@@ -1020,6 +1020,10 @@ static void sunxi_clk_resume(void)
 static struct syscore_ops sunxi_clk_syscore_ops = {
 	.suspend = sunxi_clk_suspend,
 	.resume = sunxi_clk_resume,
+};
+
+static struct syscore sunxi_clk_syscore = {
+	.ops = &sunxi_clk_syscore_ops,
 };
 #endif
 
@@ -1063,7 +1067,7 @@ void __init sunxi_clocks_init(struct device_node *node)
 	/*do some initialize arguments here*/
 	sunxi_clk_factor_initlimits();
 #ifdef CONFIG_PM_SLEEP
-	register_syscore_ops(&sunxi_clk_syscore_ops);
+	register_syscore(&sunxi_clk_syscore);
 #endif
 	sunxi_set_periphs_clk_priv_ops("pll_audio", &pll_audio_priv_ops,
 			set_pll_audio_priv_ops);
