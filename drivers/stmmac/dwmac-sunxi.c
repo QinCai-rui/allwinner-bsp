@@ -366,26 +366,26 @@ static int sunxi_dwmac_ecc_init(struct sunxi_dwmac *chip)
 	return 0;
 }
 
-static int sunxi_dwmac_init(struct platform_device *pdev, void *priv)
+static int sunxi_dwmac_init(struct device *dev, void *priv)
 {
 	struct sunxi_dwmac *chip = priv;
 	int ret;
 
 	ret = sunxi_dwmac_power_on(chip);
 	if (ret) {
-		sunxi_err(&pdev->dev, "Power on dwmac failed\n");
+		sunxi_err(dev, "Power on dwmac failed\n");
 		return ret;
 	}
 
 	ret = sunxi_dwmac_clk_init(chip);
 	if (ret) {
-		sunxi_err(&pdev->dev, "Clk init dwmac failed\n");
+		sunxi_err(dev, "Clk init dwmac failed\n");
 		goto err_clk;
 	}
 
 	ret = sunxi_dwmac_hw_init(chip);
 	if (ret)
-		sunxi_warn(&pdev->dev, "Hw init dwmac failed\n");
+		sunxi_warn(dev, "Hw init dwmac failed\n");
 
 	return 0;
 
@@ -394,7 +394,7 @@ err_clk:
 	return ret;
 }
 
-static void sunxi_dwmac_exit(struct platform_device *pdev, void *priv)
+static void sunxi_dwmac_exit(struct device *dev, void *priv)
 {
 	struct sunxi_dwmac *chip = priv;
 
@@ -641,7 +641,7 @@ static int sunxi_dwmac_probe(struct platform_device *pdev)
 		plat_dat->pmt = 1;
 	}
 
-	ret = sunxi_dwmac_init(pdev, plat_dat->bsp_priv);
+	ret = sunxi_dwmac_init(&pdev->dev, plat_dat->bsp_priv);
 	if (ret)
 		goto err_init;
 
@@ -665,7 +665,7 @@ static int sunxi_dwmac_probe(struct platform_device *pdev)
 err_cfg:
 	stmmac_dvr_remove(&pdev->dev);
 err_dvr_probe:
-	sunxi_dwmac_exit(pdev, chip);
+		sunxi_dwmac_exit(&pdev->dev, chip);
 err_init:
 	return ret;
 }
@@ -682,7 +682,7 @@ static void sunxi_dwmac_shutdown(struct platform_device *pdev)
 	struct stmmac_priv *priv = netdev_priv(ndev);
 	struct sunxi_dwmac *chip = priv->plat->bsp_priv;
 
-	sunxi_dwmac_exit(pdev, chip);
+		sunxi_dwmac_exit(&pdev->dev, chip);
 }
 
 static int __maybe_unused sunxi_dwmac_suspend(struct device *dev)
@@ -700,7 +700,7 @@ static int __maybe_unused sunxi_dwmac_suspend(struct device *dev)
 	}
 
 	ret = stmmac_suspend(dev);
-	sunxi_dwmac_exit(pdev, chip);
+		sunxi_dwmac_exit(&pdev->dev, chip);
 
 	sunxi_info(chip->dev, "suspend finish %d\n", ret);
 
@@ -715,7 +715,7 @@ static int __maybe_unused sunxi_dwmac_resume(struct device *dev)
 	struct sunxi_dwmac *chip = priv->plat->bsp_priv;
 	int ret;
 
-	sunxi_dwmac_init(pdev, chip);
+	ret = sunxi_dwmac_init(&pdev->dev, chip);
 	if (ndev && ndev->phydev) {
 		phy_device_reset(ndev->phydev, 1);
 		phy_device_reset(ndev->phydev, 0);

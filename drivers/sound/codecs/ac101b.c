@@ -12,6 +12,7 @@
 #include <linux/i2c.h>
 #include <linux/extcon.h>
 #include <linux/power_supply.h>
+#include <linux/gpio.h>
 #include <sound/soc.h>
 #include <sound/tlv.h>
 #include <sound/pcm_params.h>
