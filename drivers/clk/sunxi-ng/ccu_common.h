@@ -24,6 +24,9 @@
 /* Support key-field reg setting */
 #define CCU_FEATURE_KEY_FIELD_MOD	BIT(8)
 
+/* Pick closest rate when rounding */
+#define CCU_FEATURE_CLOSEST_RATE	BIT(16)
+
 /* New formula support in MP: clk = parent / M / P */
 #define CCU_FEATURE_MP_NO_INDEX_MODE	BIT(9)
 
@@ -115,6 +118,10 @@ struct sunxi_ccu_desc {
 
 void ccu_helper_wait_for_lock(struct ccu_common *common, u32 lock);
 void ccu_helper_wait_for_clear(struct ccu_common *common, u32 clear);
+bool ccu_is_better_rate(struct ccu_common *common,
+			unsigned long target_rate,
+			unsigned long current_rate,
+			unsigned long best_rate);
 
 struct ccu_pll_nb {
 	struct notifier_block	clk_nb;
