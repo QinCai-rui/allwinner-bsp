@@ -139,7 +139,7 @@ static void ccu_gate_init(struct clk_hw *hw)
 }
 #endif
 
-void ccu_common_helper_enable(struct ccu_common *common)
+static void ccu_common_helper_enable(struct ccu_common *common)
 {
 	u32 assoc_reg;
 
