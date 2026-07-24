@@ -115,12 +115,12 @@ static unsigned long ccu_nk_recalc_rate(struct clk_hw *hw,
 	return rate;
 }
 
-static long ccu_nk_round_rate(struct clk_hw *hw, unsigned long _rate,
-			      unsigned long *parent_rate)
+static int ccu_nk_determine_rate(struct clk_hw *hw,
+				 struct clk_rate_request *req)
 {
 	struct ccu_nk *nk = hw_to_ccu_nk(hw);
 	struct _ccu_nk _nk;
-	u64 rate = _rate;
+	u64 rate = req->rate;
 
 	if (nk->common.features & CCU_FEATURE_FIXED_POSTDIV)
 		rate *= nk->fixed_post_div;
@@ -130,14 +130,15 @@ static long ccu_nk_round_rate(struct clk_hw *hw, unsigned long _rate,
 	_nk.min_k = nk->k.min ?: 1;
 	_nk.max_k = nk->k.max ?: 1 << nk->k.width;
 
-	ccu_nk_find_best(*parent_rate, rate, &_nk);
-	rate = *parent_rate * _nk.n * _nk.k;
+	ccu_nk_find_best(req->best_parent_rate, rate, &_nk);
+	rate = req->best_parent_rate * _nk.n * _nk.k;
 
 	if (nk->common.features & CCU_FEATURE_FIXED_POSTDIV)
 		do_div(rate, nk->fixed_post_div);
 
-	trace_clk_nk_round_rate(hw, _rate, rate);
-	return rate;
+	trace_clk_nk_round_rate(hw, req->rate, (unsigned long)rate);
+	req->rate = rate;
+	return 0;
 }
 
 static int ccu_nk_set_rate(struct clk_hw *hw, unsigned long _rate,
@@ -182,7 +183,7 @@ const struct clk_ops ccu_nk_ops = {
 	.is_enabled	= ccu_nk_is_enabled,
 
 	.recalc_rate	= ccu_nk_recalc_rate,
-	.round_rate	= ccu_nk_round_rate,
+	.determine_rate	= ccu_nk_determine_rate,
 	.set_rate	= ccu_nk_set_rate,
 	.init		= ccu_nk_init,
 };

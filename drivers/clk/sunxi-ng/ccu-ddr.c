@@ -96,42 +96,42 @@ static unsigned long sunxi_ddr_clk_recalc_rate(struct clk_hw *hw,
 	return rate;
 }
 
-static long sunxi_ddr_clk_round_rate(struct clk_hw *hw,
-				     unsigned long target_rate,
-				     unsigned long *prate)
+static int sunxi_ddr_clk_determine_rate(struct clk_hw *hw,
+					struct clk_rate_request *req)
 {
 	struct sunxi_ddrclk *ddrclk = to_sunxi_ddrclk_hw(hw);
 	const struct sunxi_ddrclk_plat_data *plat_data = ddrclk->plat_data;
 	unsigned int dram_div = ddrclk->dram_div;
-	unsigned long rate = *prate << plat_data->factor;
+	unsigned long rate = req->best_parent_rate << plat_data->factor;
 
 	if ((dram_div & 0x1f) == 0x3) {
-		if (target_rate <= rate / (((dram_div >> 24) & 0x1f) + 1))
-			return rate / (((dram_div >> 24) & 0x1f) + 1);
-		else if (target_rate <= rate / (((dram_div >> 16) & 0x1f) + 1))
-			return rate / (((dram_div >> 16) & 0x1f) + 1);
-		else if (target_rate <= rate / (((dram_div >> 8) & 0x1f) + 1))
-			return rate / (((dram_div >> 8) & 0x1f) + 1);
+		if (req->rate <= rate / (((dram_div >> 24) & 0x1f) + 1))
+			req->rate = rate / (((dram_div >> 24) & 0x1f) + 1);
+		else if (req->rate <= rate / (((dram_div >> 16) & 0x1f) + 1))
+			req->rate = rate / (((dram_div >> 16) & 0x1f) + 1);
+		else if (req->rate <= rate / (((dram_div >> 8) & 0x1f) + 1))
+			req->rate = rate / (((dram_div >> 8) & 0x1f) + 1);
 		else
-			return rate / ((dram_div & 0x1f) + 1);
+			req->rate = rate / ((dram_div & 0x1f) + 1);
 	} else {
-		if (target_rate <= rate / (((dram_div >> 24) & 0x1f) + 1))
-			return rate / (((dram_div >> 24) & 0x1f) + 1);
-		else if (target_rate <= rate / (((dram_div >> 16) & 0x1f) + 1))
-			return rate / (((dram_div >> 16) & 0x1f) + 1);
-		else if (target_rate <= rate / (((dram_div >> 8) & 0x1f) + 1))
-			return rate / (((dram_div >> 8) & 0x1f) + 1);
-		else if (target_rate <= rate / ((dram_div & 0x1f) + 1))
-			return rate / ((dram_div & 0x1f) + 1);
-		else if (target_rate <= rate / 7)
-			return rate / 7;
-		else if (target_rate <= rate / 6)
-			return rate / 6;
-		else if (target_rate <= rate / 5)
-			return rate / 5;
+		if (req->rate <= rate / (((dram_div >> 24) & 0x1f) + 1))
+			req->rate = rate / (((dram_div >> 24) & 0x1f) + 1);
+		else if (req->rate <= rate / (((dram_div >> 16) & 0x1f) + 1))
+			req->rate = rate / (((dram_div >> 16) & 0x1f) + 1);
+		else if (req->rate <= rate / (((dram_div >> 8) & 0x1f) + 1))
+			req->rate = rate / (((dram_div >> 8) & 0x1f) + 1);
+		else if (req->rate <= rate / ((dram_div & 0x1f) + 1))
+			req->rate = rate / ((dram_div & 0x1f) + 1);
+		else if (req->rate <= rate / 7)
+			req->rate = rate / 7;
+		else if (req->rate <= rate / 6)
+			req->rate = rate / 6;
+		else if (req->rate <= rate / 5)
+			req->rate = rate / 5;
 		else
-			return rate / 4;
+			req->rate = rate / 4;
 	}
+	return 0;
 }
 
 static int sunxi_ddr_clk_set_rate(struct clk_hw *hw, unsigned long drate,
@@ -181,7 +181,7 @@ static int sunxi_ddr_clk_set_rate(struct clk_hw *hw, unsigned long drate,
 
 const struct clk_ops sunxi_ddrclk_ops = {
 	.recalc_rate = sunxi_ddr_clk_recalc_rate,
-	.round_rate = sunxi_ddr_clk_round_rate,
+	.determine_rate = sunxi_ddr_clk_determine_rate,
 	.set_rate = sunxi_ddr_clk_set_rate,
 };
 
