@@ -316,7 +316,7 @@ static int asoc_simple_dai_init(struct snd_soc_pcm_runtime *rtd)
 
 	sunxi_adpt_rtd_codec_dai(rtd, i, codec_dai) {
 		component = codec_dai->component;
-		dapm = &component->dapm;
+		dapm = component->dapm;
 		prefix = component->name_prefix;
 		for (j = 0; j < card->num_controls; j++) {
 			if (controls[j].info == snd_soc_dapm_info_pin_switch) {
@@ -336,7 +336,7 @@ static int asoc_simple_dai_init(struct snd_soc_pcm_runtime *rtd)
 
 	cpu_dai = sunxi_adpt_rtd_cpu_dai(rtd);
 	component = cpu_dai->component;
-	dapm = &component->dapm;
+	dapm = component->dapm;
 	prefix = component->name_prefix;
 	for (j = 0; j < card->num_controls; j++) {
 		if (controls[j].info == snd_soc_dapm_info_pin_switch) {

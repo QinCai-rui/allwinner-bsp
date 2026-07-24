@@ -31,7 +31,7 @@
 #include <drm/drm_vblank.h>
 #include <linux/proc_fs.h>
 #if defined(CONFIG_PM_DEVFREQ)
-#include <../drivers/devfreq/governor.h>
+#include <linux/devfreq-governor.h>
 #include <linux/devfreq.h>
 #endif
 #include <linux/pm_opp.h>

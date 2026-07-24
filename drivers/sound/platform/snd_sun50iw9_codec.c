@@ -591,7 +591,7 @@ static void sunxi_internal_codec_init(struct snd_soc_component *component)
 static int sunxi_internal_codec_probe(struct snd_soc_component *component)
 {
 	int ret;
-	struct snd_soc_dapm_context *dapm = &component->dapm;
+	struct snd_soc_dapm_context *dapm = component->dapm;
 	struct sunxi_codec *codec = snd_soc_component_get_drvdata(component);
 	struct sunxi_codec_dts *dts = &codec->dts;
 
