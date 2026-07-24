@@ -17,6 +17,13 @@
 #include <sound/soc.h>
 #include <sound/jack.h>
 
+/* snd_soc_dapm_kcontrol_component was renamed to
+ * snd_soc_dapm_kcontrol_to_component in recent kernels
+ */
+#ifndef snd_soc_dapm_kcontrol_component
+#define snd_soc_dapm_kcontrol_component snd_soc_dapm_kcontrol_to_component
+#endif
+
 /******* reg label *******/
 #define REG_LABEL(constant)	{constant, 0}
 #define REG_GROUP(constant)	{constant, ARRAY_SIZE(constant)}

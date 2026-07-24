@@ -125,21 +125,4 @@ of_get_gpio(const struct device_node *np, int index)
 	return of_get_gpio_flags(np, index, NULL);
 }
 
-/**
- * gpio_to_irq - Convert a GPIO number to an IRQ number
- * @gpio:	GPIO number
- *
- * Returns:
- * IRQ number for the given GPIO, or negative errno on error.
- */
-static inline int gpio_to_irq(unsigned gpio)
-{
-	struct gpio_desc *desc = gpio_to_desc(gpio);
-
-	if (!desc)
-		return -EINVAL;
-
-	return gpiod_to_irq(desc);
-}
-
 #endif /* _LINUX_OF_GPIO_H */
