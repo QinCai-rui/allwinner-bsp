@@ -1832,7 +1832,7 @@ static const struct snd_soc_dapm_route sunxi_i2s_dapm_routes[] = {
 static int sunxi_i2s_component_probe(struct snd_soc_component *component)
 {
 	struct sunxi_i2s *i2s = snd_soc_component_get_drvdata(component);
-	struct snd_soc_dapm_context *dapm = &component->dapm;
+	struct snd_soc_dapm_context *dapm = component->dapm;
 	const struct sunxi_i2s_quirks *quirks = i2s->quirks;
 	struct audio_reg_label *reg_label = i2s->reg_group.label;
 	struct sunxi_i2s_dts *dts = &i2s->dts;

@@ -17,6 +17,7 @@
 #include <linux/usb/typec_dp.h>
 #include <linux/usb/typec_mux.h>
 #include <linux/of_gpio.h>
+#include <linux/gpio.h>
 #include <linux/phy/phy.h>
 #include <dt-bindings/phy/phy.h>
 #include <linux/extcon.h>

@@ -217,7 +217,7 @@ int platform_fb_memory_alloc(struct fb_hw_info *hw_info, void **vir_addr, unsign
 #else
 	struct drm_gem_dma_object *gem;
 #endif
-	hw_info->buffer = drm_client_buffer_create(&hw_info->client, w, h, fb_fmt2_drm_fmt(fmt));
+	hw_info->buffer = drm_client_buffer_create_dumb(&hw_info->client, w, h, fb_fmt2_drm_fmt(fmt));
 	if (IS_ERR_OR_NULL(hw_info->buffer))
 		return PTR_ERR(hw_info->buffer);
 
