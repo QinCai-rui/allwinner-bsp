@@ -266,7 +266,9 @@ int sunxi_drm_mode_config_reset(struct drm_device *dev)
 		return -EINVAL;
 
 	drm_kms_helper_poll_disable(dev);
+#ifdef CONFIG_DRM_FBDEV_EMULATION
 	drm_fb_helper_set_suspend_unlocked(dev->fb_helper, 1);
+#endif
 
 	DRM_MODESET_LOCK_ALL_BEGIN(dev, ctx, 0, err);
 	state = drm_atomic_helper_duplicate_state(dev, &ctx);
@@ -285,7 +287,9 @@ out:
 	DRM_MODESET_LOCK_ALL_END(dev, ctx, err);
 	drm_atomic_state_put(state);
 
+#ifdef CONFIG_DRM_FBDEV_EMULATION
 	drm_fb_helper_set_suspend_unlocked(dev->fb_helper, 0);
+#endif
 	drm_kms_helper_poll_enable(dev);
 
 	return err;
