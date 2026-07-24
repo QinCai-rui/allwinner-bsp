@@ -734,9 +734,9 @@ out:
 }
 
 
-static int sunxi_ufs_pre_pwr_change(struct ufs_hba *hba,
-				  const struct ufs_pa_layer_attr *dev_max_params,
-				  struct ufs_pa_layer_attr *dev_req_params)
+static int sunxi_ufs_negotiate_pwr_mode(struct ufs_hba *hba,
+					 const struct ufs_pa_layer_attr *dev_max_params,
+					 struct ufs_pa_layer_attr *dev_req_params)
 {
 	struct ufs_host_params host_cap;
 	int ret;
@@ -803,7 +803,6 @@ static void ufshcd_print_pwr_info(struct ufs_hba *hba, struct ufs_pa_layer_attr 
 
 static int sunxi_ufs_pwr_change_notify(struct ufs_hba *hba,
 				     enum ufs_notify_change_status stage,
-				     const struct ufs_pa_layer_attr *dev_max_params,
 				     struct ufs_pa_layer_attr *dev_req_params)
 {
 	int ret = 0;
@@ -814,8 +813,6 @@ static int sunxi_ufs_pwr_change_notify(struct ufs_hba *hba,
 
 	switch (stage) {
 	case PRE_CHANGE:
-		ret = sunxi_ufs_pre_pwr_change(hba, dev_max_params,
-					     dev_req_params);
 		break;
 	case POST_CHANGE:
 		ufshcd_print_pwr_info(hba, dev_req_params);
@@ -1930,6 +1927,7 @@ static struct ufs_hba_variant_ops sunxi_ufs_v0_pltfm_hba_vops = {
 	.hce_enable_notify = sunxi_ufs_hce_enable_notify,
 	.link_startup_notify = sunxi_ufs_link_startup_notify,
 	.pwr_change_notify = sunxi_ufs_pwr_change_notify,
+	.negotiate_pwr_mode = sunxi_ufs_negotiate_pwr_mode,
 	.phy_initialization = sunxi_ufs_phy_config,
 	.device_reset = sunxi_ufs_device_reset,
 	.event_notify = sunxi_ufs_event_notify,
