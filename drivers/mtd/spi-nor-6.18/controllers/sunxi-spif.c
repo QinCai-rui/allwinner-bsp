@@ -48,7 +48,7 @@
 #include <boot_param.h>
 #include <linux/memblock.h>
 #include "sunxi-spif.h"
-#include "../core.h"
+#include "core.h"
 
 /* For debug */
 #define SPIF_DEBUG 0
@@ -573,7 +573,7 @@ static int update_boot_param(struct mtd_info *mtd, struct sunxi_spif *sspi)
 	/*
 	 * To not break boot0, switch bits 4K erasing
 	 */
-	if (nor->addr_width == 4)
+	if (nor->addr_nbytes == 4)
 		nor->erase_opcode = SPINOR_OP_BE_4K_4B;
 	else
 		nor->erase_opcode = SPINOR_OP_BE_4K;
@@ -1423,10 +1423,8 @@ static int sunxi_spif_normal_xfer(struct sunxi_spif *sspi, struct spi_mem_op *op
 		 *  differ only between actively configuring registers and
 		 *  configuring registers through the DMA descriptor
 		 */
-/*
 //CONFIG_DMA_ENGINE
-		sunxi_spif_cpu_start_transfer(sspi);
-*/
+//		sunxi_spif_cpu_start_transfer(sspi);
 
 		/*
 		 * Since the dma transfer completion interrupt is triggered when
@@ -1783,7 +1781,7 @@ static ssize_t sunxi_spif_nor_read(struct spi_nor *nor, loff_t from, size_t len,
 	struct sunxi_spif *sspi = nor->priv;
 	struct spi_mem_op op =
 			SPI_MEM_OP(SPI_MEM_OP_CMD(nor->read_opcode, 1),
-				   SPI_MEM_OP_ADDR(nor->addr_width, from, 1),
+				   SPI_MEM_OP_ADDR(nor->addr_nbytes, from, 1),
 				   SPI_MEM_OP_DUMMY(nor->read_dummy, 1),
 				   SPI_MEM_OP_DATA_IN(len, buf, 1));
 	size_t remaining = len;
@@ -1825,7 +1823,7 @@ static ssize_t sunxi_spif_nor_write(struct spi_nor *nor, loff_t to, size_t len,
 	struct sunxi_spif *sspi = nor->priv;
 	struct spi_mem_op op =
 			SPI_MEM_OP(SPI_MEM_OP_CMD(nor->program_opcode, 1),
-				   SPI_MEM_OP_ADDR(nor->addr_width, to, 1),
+				   SPI_MEM_OP_ADDR(nor->addr_nbytes, to, 1),
 				   SPI_MEM_OP_NO_DUMMY,
 				   SPI_MEM_OP_DATA_OUT(len, buf, 1));
 	ssize_t ret;
@@ -1895,8 +1893,8 @@ static int sunxi_spif_nor_register(struct sunxi_spif *sspi)
 	 * and add this logic so that if anyone ever adds support for such
 	 * a NOR we don't end up with buffer overflows.
 	 */
-	if (nor->page_size > PAGE_SIZE) {
-		nor->bouncebuf_size = nor->page_size;
+	if (nor->params->page_size > PAGE_SIZE) {
+		nor->bouncebuf_size = nor->params->page_size;
 		devm_kfree(nor->dev, nor->bouncebuf);
 		nor->bouncebuf = devm_kmalloc(nor->dev,
 					      nor->bouncebuf_size,
@@ -2039,7 +2037,7 @@ err0:
 	return err;
 }
 
-static int sunxi_spif_remove(struct platform_device *pdev)
+static void sunxi_spif_remove(struct platform_device *pdev)
 {
 	struct sunxi_spif *sspi = platform_get_drvdata(pdev);
 	int i;
@@ -2050,8 +2048,6 @@ static int sunxi_spif_remove(struct platform_device *pdev)
 		dma_pool_free(sspi->pool, sspi->dma_desc[i], sspi->desc_phys[i]);
 	dmam_pool_destroy(sspi->pool);
 	platform_set_drvdata(pdev, NULL);
-
-	return 0;
 }
 
 #if IS_ENABLED(CONFIG_PM)

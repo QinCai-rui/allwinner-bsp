@@ -101,32 +101,12 @@ menu "Partition parsers"
 source "$(BSP_TOP)drivers/mtd/parsers/Kconfig"
 endmenu
 
-choice
-	prompt "SPI NOR Driver Select"
-
-	config AW_MTD_SPI_NOR_NONE
-		bool "Disable SPI NOR device support"
-
-	config AW_MTD_SPI_NOR_5_15
-		bool "SPI NOR device support(5.15)"
-		depends on AW_MTD && SPI_MASTER
-		select SPI_MEM
-		help
-		  This is the framework for the SPI NOR which can be used by the SPI
-		  device drivers and the SPI NOR device driver.
-
-	config AW_MTD_SPI_NOR_6_1
-		bool "SPI NOR device support(6.1)"
-		depends on AW_MTD && SPI_MASTER
-		select SPI_MEM
-		help
-		  This is the framework for the SPI NOR which can be used by the SPI
-		  device drivers and the SPI NOR device driver.
-endchoice
-
-source "$(BSP_TOP)drivers/mtd/spi-nor-5.15/Kconfig"
-
-source "$(BSP_TOP)drivers/mtd/spi-nor-6.1/Kconfig"
+comment "SPIF_SUNXI depends on MTD_SPI_NOR"
+config SPIF_SUNXI
+	tristate "SUNXI SPIF Controller"
+	depends on AW_BSP && OF && MTD_SPI_NOR
+	help
+	  Allwinner SOC SPIF controller, present on SUNXI chips.
 
 source "$(BSP_TOP)drivers/mtd/awnand/Kconfig"
 
