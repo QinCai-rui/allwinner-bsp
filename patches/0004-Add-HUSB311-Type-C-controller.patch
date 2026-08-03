@@ -575,11 +575,11 @@ Remove them to make the driver slimmer and adding new clones easier.
 Reviewed-by: Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Signed-off-by: Alexey Charkov <alchark@flipper.net>
 ---
- drivers/usb/typec/tcpm/tcpci_rt1711h.c | 59 ++--------------------------------
+ drivers/usb/typec/tcpm/tcpci_rt1711h.c | 59 +-------------------------
  1 file changed, 2 insertions(+), 57 deletions(-)
 
 diff --git a/drivers/usb/typec/tcpm/tcpci_rt1711h.c b/drivers/usb/typec/tcpm/tcpci_rt1711h.c
-index 37cf55ad74f8..4b3e4e22a82e 100644
+index 5f44accac9dd..0af95c2d33fc 100644
 --- a/drivers/usb/typec/tcpm/tcpci_rt1711h.c
 +++ b/drivers/usb/typec/tcpm/tcpci_rt1711h.c
 @@ -18,13 +18,6 @@
@@ -638,10 +638,10 @@ index 37cf55ad74f8..4b3e4e22a82e 100644
 -	return ret;
 -}
 -
+ static void rt1711h_unregister_tcpci_port(void *tcpci);
+ 
  static int rt1711h_probe(struct i2c_client *client)
- {
- 	int ret;
-@@ -349,12 +311,6 @@ static int rt1711h_probe(struct i2c_client *client)
+@@ -351,12 +313,6 @@ static int rt1711h_probe(struct i2c_client *client)
  
  	chip->info = i2c_get_match_data(client);
  
@@ -654,8 +654,8 @@ index 37cf55ad74f8..4b3e4e22a82e 100644
  	chip->data.regmap = devm_regmap_init_i2c(client,
  						 &rt1711h_regmap_config);
  	if (IS_ERR(chip->data.regmap))
-@@ -408,27 +364,16 @@ static void rt1711h_remove(struct i2c_client *client)
- 	tcpci_unregister_port(chip->tcpci);
+@@ -412,27 +368,16 @@ static void rt1711h_unregister_tcpci_port(void *tcpci)
+ 	tcpci_unregister_port(tcpci);
  }
  
 -static const struct rt1711h_chip_info et7304 = {
@@ -683,7 +683,7 @@ index 37cf55ad74f8..4b3e4e22a82e 100644
  	{ "rt1711h", (kernel_ulong_t)&rt1711h },
  	{ "rt1715", (kernel_ulong_t)&rt1715 },
  	{}
-@@ -436,7 +381,7 @@ static const struct i2c_device_id rt1711h_id[] = {
+@@ -440,7 +385,7 @@ static const struct i2c_device_id rt1711h_id[] = {
  MODULE_DEVICE_TABLE(i2c, rt1711h_id);
  
  static const struct of_device_id rt1711h_of_match[] = {

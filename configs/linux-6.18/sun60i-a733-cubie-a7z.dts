@@ -6,7 +6,7 @@
 
 /{
 	board = "A733", "A733-CUBIE-A7Z-AXP318";
-	compatible = "radxa,cubie-a7z", "arm,sun60iw2p1", "allwinner,sun60i-a733";
+	compatible = "radxa,a733", "radxa,cubie-a7z", "arm,sun60iw2p1", "allwinner,sun60i-a733";
 
 	reg_usb2_vbus: usb2-vbus {
 		compatible = "regulator-fixed";
@@ -1246,9 +1246,9 @@
 						 PDO_VAR(15000, 15000, 3000)
 						 PDO_VAR(20000, 20000, 2250)*/
 						>;
-			/* fixme */
-			sink-vdos = <0xd1002e99 0x00 0x03110000>;
-			sink-vdos-v1 = <0xd1002e99 0x00 0x03110000>;
+			/* ET7304 identity: VID 0x6dcf, PID 0x1711 */
+			sink-vdos = <0xd1006dcf 0x00 0x17110000>;
+			sink-vdos-v1 = <0xd1006dcf 0x00 0x17110000>;
 
 			altmodes {
 				displayport {

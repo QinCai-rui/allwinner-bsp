@@ -252,7 +252,7 @@ Reviewed-by: Heikki Krogerus <heikki.krogerus@linux.intel.com>
  1 file changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/usb/typec/tcpm/tcpci_rt1711h.c b/drivers/usb/typec/tcpm/tcpci_rt1711h.c
-index 88c50b984e8a..37cf55ad74f8 100644
+index cd74cb9350fa..5f44accac9dd 100644
 --- a/drivers/usb/typec/tcpm/tcpci_rt1711h.c
 +++ b/drivers/usb/typec/tcpm/tcpci_rt1711h.c
 @@ -19,9 +19,11 @@
@@ -284,8 +284,8 @@ index 88c50b984e8a..37cf55ad74f8 100644
  		dev_err(&i2c->dev, "vid is not correct, 0x%04x\n", ret);
  		return -ENODEV;
  	}
-@@ -405,17 +408,27 @@ static void rt1711h_remove(struct i2c_client *client)
- 	tcpci_unregister_port(chip->tcpci);
+@@ -409,17 +412,27 @@ static void rt1711h_unregister_tcpci_port(void *tcpci)
+ 	tcpci_unregister_port(tcpci);
  }
  
 +static const struct rt1711h_chip_info et7304 = {
@@ -312,7 +312,7 @@ index 88c50b984e8a..37cf55ad74f8 100644
  	{ "rt1711h", (kernel_ulong_t)&rt1711h },
  	{ "rt1715", (kernel_ulong_t)&rt1715 },
  	{}
-@@ -423,6 +436,7 @@ static const struct i2c_device_id rt1711h_id[] = {
+@@ -427,6 +440,7 @@ static const struct i2c_device_id rt1711h_id[] = {
  MODULE_DEVICE_TABLE(i2c, rt1711h_id);
  
  static const struct of_device_id rt1711h_of_match[] = {
