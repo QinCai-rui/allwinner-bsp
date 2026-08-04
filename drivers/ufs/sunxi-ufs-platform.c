@@ -18,11 +18,7 @@
 #include <linux/reset.h>
 #include <linux/clk.h>
 #include <linux/version.h>
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(5, 15, 119))
 #include "../../../drivers/ufs/host/ufshcd-pltfrm.h"
-#else
-#include "../../../drivers/scsi/ufs/ufshcd-pltfrm.h"
-#endif
 #include "ufshcd-sunxi.h"
 #include "tc-dwc.h"
 #include "ufshci-sunxi.h"
@@ -367,12 +363,12 @@ static int sunxi_ufs_rmmi_config(struct ufs_hba *hba)
 					DME_LOCAL },
 		{ UIC_ARG_MIB_SEL(RMMI_RXRHOLDCTRLOPT, SELIND_LN1_RX), 0x02,
 					DME_LOCAL },
-#if 1
+
 		{ UIC_ARG_MIB(EXT_COARSE_TUNE_RATEA), 0x2,
 					DME_LOCAL },/*reset value 0x2*/
 		{ UIC_ARG_MIB(EXT_COARSE_TUNE_RATEB), 0x80,
 					DME_LOCAL },/*reset value 0x80*/
-#endif
+
 		{ UIC_ARG_MIB(RMMI_CBCRCTRL), 0x01, DME_LOCAL },
 		{ UIC_ARG_MIB(VS_MPHYCFGUPDT), 0x01, DME_LOCAL },
 	};
@@ -750,7 +746,7 @@ out:
 	return err;
 }
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 18, 21))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(7, 1, 0))
 static int sunxi_ufs_pre_pwr_change(struct ufs_hba *hba,
 				  const struct ufs_pa_layer_attr *dev_max_params,
 				  struct ufs_pa_layer_attr *dev_req_params)
@@ -793,7 +789,7 @@ out:
 }
 
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 18, 21))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0))
 /**
  * sunxi_ufs_negotiate_pwr_mode - negotiate power mode parameters
  * @hba: per-adapter instance
@@ -845,7 +841,7 @@ static void ufshcd_print_pwr_info(struct ufs_hba *hba, struct ufs_pa_layer_attr 
 }
 
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 18, 21))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(7, 1, 0))
 static int sunxi_ufs_pwr_change_notify(struct ufs_hba *hba,
 				     enum ufs_notify_change_status stage,
 				     const struct ufs_pa_layer_attr *dev_max_params,
@@ -863,7 +859,7 @@ static int sunxi_ufs_pwr_change_notify(struct ufs_hba *hba,
 	dev_dbg(hba->dev, "pm lvl 5:ufs power down and link off\n");
 
 	switch (stage) {
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 18, 21))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(7, 1, 0))
 	case PRE_CHANGE:
 		ret = sunxi_ufs_pre_pwr_change(hba, dev_max_params,
 					     dev_req_params);
@@ -916,49 +912,10 @@ static void sunxi_ufs_hibern8_notify(struct ufs_hba *hba, enum uic_cmd_dme cmd,
 static inline struct scsi_device *sunxi_hba_to_wlun(struct ufs_hba *hba)
 {
 	struct scsi_device *sdp;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
 	sdp = hba->ufs_device_wlun;
-#else
-	sdp = hba->sdev_ufs_device;
-#endif
 	return sdp;
 }
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 6, 98)
-static int sunxi_ufs_suspend(struct ufs_hba *hba, enum ufs_pm_op pm_op)
-{
-	int ret = 0;
-	if (pm_op == UFS_SYSTEM_PM) {
-		struct scsi_device *sdp;
-		unsigned long flags;
-
-		spin_lock_irqsave(hba->host->host_lock, flags);
-		sdp = sunxi_hba_to_wlun(hba);
-		if (sdp && scsi_device_online(sdp))
-			ret = scsi_device_get(sdp);
-		else
-			ret = -ENODEV;
-		spin_unlock_irqrestore(hba->host->host_lock, flags);
-
-		if (ret) {
-			dev_err(hba->dev, "sunxi ufs suspend scsi device get faile\n");
-			goto out;
-		}
-
-		/*disable uevent to avoid netlink(cause by ufs device UAC) to resmue systme**/
-		dev_set_uevent_suppress(&sdp->sdev_gendev, true);
-		dev_dbg(hba->dev, "disable uevent\n");
-		scsi_device_put(sdp);
-		sunxi_ufs_sys_clk_deinit(hba);
-	} else {
-		dev_err(hba->dev, "Unsupport pm_op %x\nr", pm_op);
-		ret = -EINVAL;
-	}
-
-out:
-	return ret;
-}
-#else
 static int sunxi_ufs_suspend(struct ufs_hba *hba, enum ufs_pm_op pm_op,
 					enum ufs_notify_change_status status)
 {
@@ -999,7 +956,6 @@ static int sunxi_ufs_suspend(struct ufs_hba *hba, enum ufs_pm_op pm_op,
 out:
 	return ret;
 }
-#endif
 
 static int sunxi_ufs_resume(struct ufs_hba *hba, enum ufs_pm_op pm_op)
 {
@@ -1354,7 +1310,7 @@ static int sunxi_ufs_sys_clk_init(struct ufs_hba *hba)
 	int rval = 0;
 	u32 rate = 0;
 	priv = hba->priv;
-#if 1
+
 	/*Only to avoid waring when disable clk and rst if no enable first*
 	 *Start
 	 * */
@@ -1403,7 +1359,7 @@ static int sunxi_ufs_sys_clk_init(struct ufs_hba *hba)
 	//dev_err(hba->dev, "%s,%d\n", __FUNCTION__, __LINE__);
 
 	//sunxi_ufs_dump_ccu_reg();
-#endif
+
 	dev_dbg(hba->dev, "sys clk init\n");
 
 	rval = clk_prepare_enable(priv->clk[SUNXI_UFS_CFG_CLK_GATING].uclk);
@@ -2006,7 +1962,7 @@ static struct ufs_hba_variant_ops sunxi_ufs_v0_pltfm_hba_vops = {
 	.exit = sunxi_ufs_host_exit,
 	.hce_enable_notify = sunxi_ufs_hce_enable_notify,
 	.link_startup_notify = sunxi_ufs_link_startup_notify,
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 18, 21))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0))
 	.negotiate_pwr_mode = sunxi_ufs_negotiate_pwr_mode,
 #endif
 	.pwr_change_notify = sunxi_ufs_pwr_change_notify,

@@ -421,10 +421,10 @@ index 000000000000..7bd8983a39ef
 +#endif /* _DT_BINDINGS_CLK_SUN60IW2_R_CCU_H_ */
 diff --git a/include/dt-bindings/clock/sun60iw2-rtc.h b/include/dt-bindings/clock/sun60iw2-rtc.h
 new file mode 100644
-index 000000000000..83fc97d75370
+index 000000000000..7a6e3ce8eaf3
 --- /dev/null
 +++ b/include/dt-bindings/clock/sun60iw2-rtc.h
-@@ -0,0 +1,26 @@
+@@ -0,0 +1,27 @@
 +// SPDX-License-Identifier: (GPL-2.0+ or MIT)
 +/* Copyright(c) 2020 - 2023 Allwinner Technology Co.,Ltd. All rights reserved. */
 +/*
@@ -447,8 +447,9 @@ index 000000000000..83fc97d75370
 +#define CLK_RTC_DCXO_SERDES0	10
 +#define CLK_RTC_SPI		11
 +#define CLK_DCXO		12
++#define CLK_DCXO_UFS		13
 +
-+#define CLK_RTC_MAX_NO                      (CLK_DCXO + 1)
++#define CLK_RTC_MAX_NO                      (CLK_DCXO_UFS + 1)
 +
 +#endif /* _DT_BINDINGS_CLK_SUN60IW2_RTC_H_ */
 diff --git a/include/dt-bindings/clock/sunxi-ccu.h b/include/dt-bindings/clock/sunxi-ccu.h
